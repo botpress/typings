@@ -1,9 +1,8 @@
-declare interface Dic<T> {
-  [Key: string]: T
-}
-
 /**
- * lol
+ * This is the official Botpress SDK, designed to help our fellow developers to create wonderful modules and
+ * extend the world's best chatbot functionality to make it even better! Your module will receives an instance of
+ * this SDK (Yes, all those beautiful features!) to kick start your development. Missing something important?
+ * Please let us know in our official Github Repo!
  */
 declare module 'botpress/sdk' {
   import { NextFunction, Request, Response, Router } from 'express'
@@ -840,6 +839,13 @@ declare module 'botpress/sdk' {
     author?: string
     disabled?: boolean
     private?: boolean
+    /**
+     * When true, the studio considers the bot as "standalone"
+     * - Auth Gate is available
+     * - We provide the runtime sdk instead of the full sdk
+     * - We add hooks create short links
+     */
+    standalone?: boolean
     version: string
     imports: {
       /** Defines the list of content types supported by the bot */
@@ -853,6 +859,32 @@ declare module 'botpress/sdk' {
     languages: string[]
     locked: boolean
     pipeline_status: BotPipelineStatus
+    qna: {
+      disabled: boolean
+    }
+    skillChoice: {
+      /**
+       * @default true
+       */
+      matchNumbers: boolean
+      /**
+       * @default true
+       */
+      matchNLU: boolean
+    }
+    skillSendEmail: {
+      /**
+       * Nodemailer2 transport connection string.
+       * @see https://www.npmjs.com/package/nodemailer2
+       *
+       * Alternatively, you can pass an object with any required parameters
+       * @see https://nodemailer.com/smtp/#examples
+       *
+       * @example smtps://user%40gmail.com:pass@smtp.gmail.com
+       * @default <<change me>>
+       */
+      transportConnectionString: string
+    }
 
     /**
      * constant number used to seed nlu random number generators
@@ -861,10 +893,6 @@ declare module 'botpress/sdk' {
     nluSeed?: number
     nluModels?: {
       [lang: string]: string
-    }
-
-    qna: {
-      disabled: boolean
     }
 
     cloud?: CloudConfig
@@ -974,6 +1002,19 @@ declare module 'botpress/sdk' {
     enableUnsecuredEndpoint: boolean
   }
 
+  export interface ParsedContentType {
+    id: ContentType['id']
+    count: number
+    title: ContentType['title']
+    hidden: ContentType['hidden']
+    schema: {
+      json: ContentType['jsonSchema']
+      ui: ContentType['uiSchema']
+      title: ContentType['title']
+      renderer: ContentType['id']
+    }
+  }
+
   /**
    * A Content Element is a single item of a particular Content Type @see ContentType.
    * Content Types contains many Elements. An Element belongs to a single Content Type.
@@ -983,7 +1024,7 @@ declare module 'botpress/sdk' {
     /** The Id of the Content Type for which the Element belongs to. */
     contentType: string
     /** The raw form data that contains templating that needs to be interpreted. */
-    formData: object
+    formData: FormData
     /** The computed form data that contains the interpreted data. */
     computedData: object
     /** The textual representation of the Content Element, for each supported languages  */
@@ -991,6 +1032,8 @@ declare module 'botpress/sdk' {
     createdOn: Date
     modifiedOn: Date
     createdBy: string
+    schema?: ParsedContentType['schema']
+    botId?: string
   }
 
   /**
@@ -1001,13 +1044,14 @@ declare module 'botpress/sdk' {
   export interface ContentType {
     id: string
     title: string
-    description: string
+    group?: string
+    description?: string
     /**
      * Hiding content types prevents users from adding these kind of elements via the Flow Editor.
      * They are still visible in the Content Manager, and it's still possible to use these elements by specifying
      * their name as a property "contentType" to ContentPickerWidget.
      */
-    hidden: boolean
+    hidden?: boolean
     /**
      * The jsonSchema used to validate the form data of the Content Elements.
      */
@@ -1022,12 +1066,12 @@ declare module 'botpress/sdk' {
      * @param channel The channel used to communicate, e.g. channel-web, messenger, twilio, etc.
      * @returns Return an array of rendered Content Elements
      */
-    renderElement: (data: object, channel: string) => object[]
+    renderElement: (data: object, channel: string) => object[] | object
     /**
      * Function that computes the visual representation of the text.
      * This function resides in the javascript definition of the Content Type.
      */
-    computePreviewText?: (formData: object) => string
+    computePreviewText?: (formData: any) => string
   }
 
   export type CustomContentType = Omit<Partial<ContentType>, 'id'> & {
@@ -1685,11 +1729,7 @@ declare module 'botpress/sdk' {
      * @param eventDestination - The destination to identify the target
      * @param payloads - One or multiple payloads to send
      */
-    export function replyToEvent(
-      eventDestination: IO.EventDestination,
-      payloads: any[],
-      incomingEventId?: string
-    ): Promise<void>
+    export function replyToEvent(eventDestination: IO.EventDestination, payloads: any[], incomingEventId?: string): void
 
     /**
      * Return the state of the incoming queue. True if there are any events(messages)
