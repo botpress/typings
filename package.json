@@ -1,6 +1,6 @@
 {
-  "name": "@botpress/common",
-  "version": "1.0.0",
+  "name": "@botpress/typings",
+  "version": "12.22.2",
   "private": false,
   "engines": {
     "node": "^12"
@@ -8,7 +8,7 @@
   "author": "Botpress, Inc.",
   "license": "AGPL-3.0",
   "main": "index.js",
-  "repository": "https://github.com/botpress/common.git",
+  "repository": "https://github.com/botpress/typings.git",
   "scripts": {
     "build": "yarn tsc"
   },

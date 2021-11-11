@@ -17,5 +17,6 @@
     "rootDir": "src/",
     "typeRoots": ["./src/typings", "../../node_modules/@types", "./src/common"],
     "types": ["reflect-metadata", "jest"]
-  }
+  },
+  "include": ["**/*.d.ts"],
 }
