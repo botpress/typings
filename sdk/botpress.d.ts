@@ -487,6 +487,7 @@ declare module 'botpress/sdk' {
 
     export interface EventUnderstanding {
       readonly errored: boolean
+      readonly modelId: string | undefined
 
       readonly predictions?: {
         [context: string]: {
@@ -896,6 +897,7 @@ declare module 'botpress/sdk' {
     }
 
     cloud?: CloudConfig
+    isCloudBot?: boolean
   }
 
   export interface CloudConfig {
