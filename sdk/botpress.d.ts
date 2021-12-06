@@ -898,7 +898,6 @@ declare module 'botpress/sdk' {
 
     cloud?: CloudConfig
     isCloudBot?: boolean
-    bpCloudApiKey?: string
   }
 
   export interface CloudConfig {
